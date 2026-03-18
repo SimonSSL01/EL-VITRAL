@@ -1,8 +1,6 @@
 import React from 'react';
 
 const ElVitral: React.FC = () => {
-  // Opcional: estado para manejar el menú hamburguesa en móviles o el banner de cookies
-  // const [isCookieBannerVisible, setIsCookieBannerVisible] = React.useState(true);
 
   return (
     <>
@@ -23,7 +21,7 @@ const ElVitral: React.FC = () => {
               <img
                 alt="El Vitral Logo"
                 className="h-12 w-auto"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuCw3N9xt63VZtFaDchJsolG145gpnt5os7D925BsCUpz3egb--NUEz6_sNgYHhEcYgs1XelMAUed1QmOH7Z_DQKL8c1HlVP5vlKIZeI_JtXjkFtCsuS_UAx-dZN489XM3yLBlFbsFJKA7AlTMbH7WOQ7--t1zjK_fftfuEWTJ5-4jcXCgd1CQYE-bG2CH5TTzVD97wur-eaCv_8QrxtCBk04z9lLSi2pudd-8vXoWj4p0XciYQIuMBt-7ObmhCL2CyDK-U1SMk6FV"
+                src="LINK PARA EL LOGO"
               />
             </div>
 
@@ -47,9 +45,7 @@ const ElVitral: React.FC = () => {
               >
                 Cotizar
               </a>
-              <button className="bg-primary hover:bg-secondary text-white px-5 py-2.5 rounded-md font-medium transition-colors">
-                Invierte desde el exterior
-              </button>
+              
 
               {/* Buscador */}
               <div className="relative">
@@ -238,38 +234,6 @@ const ElVitral: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* Botón flotante de ayuda */}
-      <button className="fixed bottom-6 right-6 bg-primary text-white p-4 rounded-full shadow-lg hover:bg-secondary transition-colors z-50">
-        <span className="material-symbols-outlined text-3xl">support_agent</span>
-      </button>
-
-      {/* Banner de cookies (fijo abajo) */}
-      <div className="fixed bottom-0 w-full bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg z-50 p-4">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div>
-            <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
-              We value your privacy
-            </h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              We use cookies to enhance your browsing experience, serve
-              personalized ads or content, and analyze our traffic. By clicking
-              "Accept All", you consent to our use of cookies.
-            </p>
-          </div>
-          <div className="flex flex-shrink-0 gap-3">
-            <button className="px-6 py-2 border border-primary text-primary dark:text-blue-400 dark:border-blue-400 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors bg-transparent">
-              Customize
-            </button>
-            <button className="px-6 py-2 border border-primary text-primary dark:text-blue-400 dark:border-blue-400 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors bg-transparent">
-              Reject All
-            </button>
-            <button className="px-6 py-2 bg-primary text-white rounded-md font-medium hover:bg-secondary transition-colors">
-              Accept All
-            </button>
-          </div>
-        </div>
-      </div>
     </>
   );
 };
