@@ -13,10 +13,11 @@ export default function LandingPage() {
       <div className="relative h-[600px] flex items-center justify-center">
         <div className="absolute inset-0 w-full h-full">
           <Image
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPgLEmADED3vEpHFS6lB99jhubSIKExBrHIXgpnAFxuTG3Aq_7jF42F8O58kxkKOtBbHyCtLwZiBJww69IM9UzSsWGzWANvGhmKS5IXk_ofw_n_Z359bVYX5aO6laiJfoTIbgnbLKbgTBKCy-4hRD0znWWagafzVhiMxKZzLwL89E65BbiyRiTGw1xhmim938mzzoT4JP191OlgdnKnyEnoKnfdcwr-OaMBM9xD4kgGARzkIzHkED5Dmd4nJz94Nse3xs8ZRs0yT2I"
+            src="https://forbes.es/wp-content/uploads/2022/03/California-2.jpg"
             alt="Modern Glass Architecture Background"
             fill
             className="object-cover"
+            unoptimized
           />
           <div className="absolute inset-0 bg-black/50"></div>
         </div>
@@ -82,11 +83,12 @@ export default function LandingPage() {
             <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow group cursor-pointer border border-gray-100 dark:border-gray-700">
               <div className="h-64 overflow-hidden">
                 <Image
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfnr3iqrwo4jDFaFRAYGgrn0YPHSrNelpFP2h078RWEsUvmPkLuR3AQ5kuX0bTj1BvFyJpRt74he1E3lXcGv0yQS0iDYgJF4-YsY20exirmEHyBgYceyAX1R-ABqfN1Jd0u1MVtBLZQ7ec39WVKuP9v-k-9Gf7WUkbUjat3kZBZ5uaAU657zcp1DwakyTcqLzLtgDH93u_8bKfhbKqU0K0Fc7XfAbry7FS1bJp-WYzHmR4M_FbCCrK3nyVL7-w9Rkc0zWHb9eEfBqv"
+                  src="https://http2.mlstatic.com/D_NQ_NP_688557-MLA93186795373_092025-O.webp"
                   alt="Fachada de Vidrio Comercial"
                   width={400}
                   height={256}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  unoptimized
                 />
               </div>
               <div className="p-6">
