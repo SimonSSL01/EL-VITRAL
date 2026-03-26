@@ -14,6 +14,7 @@ interface User {
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [message, setMessage] = useState('');
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -21,10 +22,12 @@ export default function Navbar() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const res = await fetch('/api/auth/me');
+      const res = await fetch('/api/auth/me', { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         setUser(data);
+      } else {
+        setUser(null);
       }
     };
     fetchUser();
@@ -50,10 +53,14 @@ export default function Navbar() {
   const closeMenu = () => setMenuOpen(false);
 
   const logout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
     setUser(null);
-    router.push('/');
+    setMessage('Salida exitosa');
     closeMenu();
+    setTimeout(() => {
+      setMessage('');
+      router.push('/');
+    }, 1400);
   };
 
   return (
@@ -67,7 +74,6 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {}
           <div className="hidden md:flex items-center space-x-8">
             <Link
               href="/"
@@ -96,15 +102,15 @@ export default function Navbar() {
             >
               Cotizar
             </Link>
-            <Link 
-              href="/sobre-nosotros" 
+            <Link
+              href="/sobre-nosotros"
               className={`font-medium ${
                 pathname === '/sobre-nosotros' ? 'text-primary' : 'text-gray-700 dark:text-gray-200'
-                }`}
-                onClick={closeMenu}
-              >
-                Sobre Nosotros  
-              </Link>  
+              }`}
+              onClick={closeMenu}
+            >
+              Sobre Nosotros
+            </Link>
             {user && (
               <>
                 <Link
@@ -131,7 +137,6 @@ export default function Navbar() {
             )}
           </div>
 
-          {}
           <div className="hidden md:flex items-center relative">
             <div
               ref={buttonRef}
@@ -167,9 +172,13 @@ export default function Navbar() {
                   </>
                 ) : (
                   <>
-                    <div className="px-4 py-2 text-sm text-gray-500 border-b border-gray-200 dark:border-gray-700">
+                    <Link
+                      href="/perfil"
+                      className="block px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      onClick={closeMenu}
+                    >
                       Hola, {user.nombre}
-                    </div>
+                    </Link>
                     <Link
                       href="/mis-pedidos"
                       className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -198,7 +207,6 @@ export default function Navbar() {
             )}
           </div>
 
-          {}
           <div className="md:hidden flex items-center">
             <button
               onClick={toggleMenu}
@@ -208,7 +216,6 @@ export default function Navbar() {
             </button>
             {menuOpen && (
               <div className="absolute right-4 top-16 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 border border-gray-200 dark:border-gray-700 z-50">
-                {}
                 {!user ? (
                   <>
                     <Link href="/" className="block px-4 py-2 text-sm" onClick={closeMenu}>Inicio</Link>
@@ -220,7 +227,9 @@ export default function Navbar() {
                   </>
                 ) : (
                   <>
-                    <div className="px-4 py-2 text-sm text-gray-500 border-b">Hola, {user.nombre}</div>
+                    <Link href="/perfil" className="block px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700" onClick={closeMenu}>
+                      Hola, {user.nombre}
+                    </Link>
                     <Link href="/sobre-nosotros" className="block px-4 py-2 text-sm" onClick={closeMenu}>Sobre Nosotros</Link>
                     <Link href="/mis-pedidos" className="block px-4 py-2 text-sm" onClick={closeMenu}>Mis Pedidos</Link>
                     {user.rol === 'admin' && (
@@ -235,6 +244,11 @@ export default function Navbar() {
             )}
           </div>
         </div>
+        {message && (
+          <div className="mt-2 bg-green-100 text-green-800 px-4 py-2 rounded shadow text-center">
+            {message}
+          </div>
+        )}
       </div>
     </nav>
   );

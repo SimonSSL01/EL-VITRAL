@@ -19,7 +19,14 @@ export const verifyToken = (token: string) => {
 
 export const getUserFromRequest = (req: NextRequest) => {
   const authHeader = req.headers.get('authorization');
-  if (!authHeader?.startsWith('Bearer ')) return null;
-  const token = authHeader.substring(7);
+  let token: string | undefined;
+
+  if (authHeader?.startsWith('Bearer ')) {
+    token = authHeader.substring(7);
+  } else {
+    token = req.cookies.get('token')?.value;
+  }
+
+  if (!token) return null;
   return verifyToken(token);
 };
