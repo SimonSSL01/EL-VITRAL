@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 
-export async function GET(request: NextRequest, { params }: { params: { codigo: string } }) {
-  const cotizaciones = await query('SELECT * FROM cotizaciones WHERE codigo_unico = ?', [params.codigo]);
+export async function GET(request: NextRequest, { params }: { params: Promise<{ codigo: string }> }) {
+  const { codigo } = await params;
+  const cotizaciones = await query('SELECT * FROM cotizaciones WHERE codigo_unico = ?', [codigo]);
   const cotizacion = (cotizaciones as any[])[0];
   if (!cotizacion) {
     return NextResponse.json({ error: 'No encontrada' }, { status: 404 });
