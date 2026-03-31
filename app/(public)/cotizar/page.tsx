@@ -212,7 +212,7 @@ export default function CotizarPage() {
           <div className="bg-green-900/30 border border-green-500 p-6 rounded-md text-center">
             <p className="text-xl text-white mb-4">Tu código de cotización es:</p>
             <p className="text-4xl font-mono font-bold text-primary">{resultado.codigo}</p>
-            <p className="text-gray-300 mt-4">Guarda este código para consultar tu cotización más tarde.</p>
+            <p className="text-gray-300 mt-4">Guarda este código para consultar tu cotización más tarde y recuerda que tienes que convertir la cotización en un pedido para proceder con la compra.</p>
           </div>
           <button
             onClick={() => router.push('/catalogo')}
