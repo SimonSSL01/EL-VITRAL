@@ -14,6 +14,13 @@ interface Cotizacion {
   codigo_unico: string;
 }
 
+const formatNumber = (value: number): string => {
+  return new Intl.NumberFormat('es-CO', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+};
+
 export default function CotizacionesPage() {
   const [cotizaciones, setCotizaciones] = useState<Cotizacion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,91 +95,89 @@ export default function CotizacionesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#101828'}}>
         <NavBar />
-        <div className="flex items-center justify-center py-12">
-          <div className="text-xl">Cargando cotizaciones...</div>
-        </div>
+          <div className="text-white text-xl">Cargando cotizaciones...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style= {{ backgroundColor: '#101828'}}>
       <NavBar />
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <h1 className="text-3xl font-bold mb-8">Mis Cotizaciones</h1>
+      <div className="max-w-7xl mx-auto px-4">
+        <h1 className="text-3xl font-bold text-white mb-8">Mis Cotizaciones</h1>
 
         {cotizaciones.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No tienes cotizaciones realizadas</p>
+          <div className="rounded-lg p-10 text-center" style={{ backgroundColor: '#1e2939'}}>
+            <p className="text-gray-300 text-lg">No tienes cotizaciones realizadas</p>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="rounded-lg shadow-md overflow-hidden" style={{ backgroundColor: '#1e2939'}}>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-800">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                       Código
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                       Cliente
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                       Fecha
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                       Total
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                       Estado
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                       Acciones
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-700">
                   {cotizaciones.map((cotizacion) => (
-                    <tr key={cotizacion.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr key={cotizacion.id} className="hover:bg-gray-800/50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
                         {cotizacion.codigo_unico}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                         {cotizacion.nombre_cliente}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                         {new Date(cotizacion.fecha_cotizacion).toLocaleDateString()}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${parseFloat(cotizacion.total.toString()).toFixed(2)}
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                        ${formatNumber(cotizacion.total)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           cotizacion.estado === 'vigente'
-                            ? 'bg-green-100 text-green-800'
+                            ? 'bg-green-900/50 text-green-300'
                             : cotizacion.estado === 'aprobada'
-                            ? 'bg-blue-100 text-blue-800'
+                            ? 'bg-blue-900/50 text-blue-300'
                             : cotizacion.estado === 'convertida'
-                            ? 'bg-purple-100 text-purple-800'
-                            : 'bg-red-100 text-red-800'
+                            ? 'bg-purple-900/50 text-purple-300'
+                            : 'bg-red-900/50 text-red-300'
                         }`}>
                           {cotizacion.estado}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
                         {cotizacion.estado !== 'convertida' && (
                           <button
                             onClick={() => convertirAPedido(cotizacion.id)}
-                            className="text-primary hover:text-primary-dark mr-4"
+                            className="text-primary hover:text-secondary"
                           >
                             Convertir a Pedido
                           </button>
                         )}
                         <button
                           onClick={() => verDetalles(cotizacion.codigo_unico)}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-blue-400 hover:text-blue-300"
                         >
                           Ver Detalles
                         </button>
@@ -187,12 +192,12 @@ export default function CotizacionesPage() {
       </div>
 
       {showModal && selectedCotizacion && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto" style={{ backgroundColor: '#1e2939'}}>
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold">Detalle de cotización</h2>
-                <button onClick={() => setShowModal(false)} className="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+                <h2 className="text-2xl font-bold text-white">Detalle de cotización</h2>
+                <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-200 text-2xl">×</button>
               </div>
 
               <div className="mb-4">
@@ -204,19 +209,19 @@ export default function CotizacionesPage() {
                 <p><strong>Estado:</strong> {selectedCotizacion.estado}</p>
               </div>
 
-              <h3 className="font-bold mb-2">Productos</h3>
+              <h3 className="font-bold text-white mb-2">Productos</h3>
               <div className="overflow-x-auto mb-4">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="bg-gray-100">
-                      <th className="p-2 text-xs">Descripción</th>
-                      <th className="p-2 text-xs">Medidas</th>
-                      <th className="p-2 text-xs">Cantidad</th>
-                      <th className="p-2 text-xs">Precio</th>
+                    <tr className="bg-gray-800">
+                      <th className="p-2 text-xs font-medium text-gray-300">Descripción</th>
+                      <th className="p-2 text-xs font-medium text-gray-300">Medidas</th>
+                      <th className="p-2 text-xs font-medium text-gray-300">Cantidad</th>
+                      <th className="p-2 text-xs font-medium text-gray-300">Precio</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {selectedCotizacion.detalles?.map((det, i) => (
+                  <tbody className='divide-y divide-gray-700'>
+                    {selectedCotizacion.detalles?.map((det: any, i: number) => (
                       <tr key={i} className="border-b">
                         <td className="p-2">{det.descripcion}</td>
                         <td className="p-2">{det.medida_largo && det.medida_ancho ? `${det.medida_largo}x${det.medida_ancho} cm` : 'No aplica'}</td>
@@ -228,8 +233,8 @@ export default function CotizacionesPage() {
                 </table>
               </div>
 
-              <div className="text-right">
-                <p className="text-xl font-bold">Total: ${Number(selectedCotizacion.total).toFixed(2)}</p>
+              <div className="text-right pt-4 border-t border-gray-700">
+                <p className="text-xl font-bold text-primary">Total: ${formatNumber(selectedCotizacion.total)}</p>
               </div>
             </div>
           </div>
