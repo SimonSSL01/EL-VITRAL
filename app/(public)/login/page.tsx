@@ -1,27 +1,43 @@
 'use client';
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ReCAPTCHA from 'react-google-recaptcha';
+
+const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    if (!siteKey) {
+      setError('Captcha no está configurado. Define NEXT_PUBLIC_RECAPTCHA_SITE_KEY.');
+      setLoading(false);
+      return;
+    }
+
+    if (!recaptchaToken) {
+      setError('Por favor, completa el captcha antes de continuar.');
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, recaptchaToken }),
       });
 
       const data = await res.json();
@@ -34,6 +50,7 @@ export default function LoginPage() {
         }, 1200);
       } else {
         setError(data.error || 'Error al iniciar sesión');
+        setRecaptchaToken(null);
       }
     } catch {
       setError('Error de conexión');
@@ -127,10 +144,28 @@ export default function LoginPage() {
               </div>
             </div>
 
+            <div className="space-y-2">
+              <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Captcha
+              </div>
+              {siteKey ? (
+                <div className="flex justify-center">
+                  <ReCAPTCHA
+                    sitekey={siteKey}
+                    onChange={(token) => setRecaptchaToken(token)}
+                  />
+                </div>
+              ) : (
+                <div className="rounded-md border border-yellow-400 bg-yellow-50 px-4 py-3 text-yellow-800">
+                  Captcha no configurado. Añade <code>NEXT_PUBLIC_RECAPTCHA_SITE_KEY</code> en tu archivo de entorno.
+                </div>
+              )}
+            </div>
+
             <div>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !siteKey}
                 className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white 
                 bg-primary hover:bg-secondary 
                 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary 

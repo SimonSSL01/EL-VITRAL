@@ -1,11 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { comparePassword, generateToken, hashPassword } from '@/lib/auth';
-import { cookies } from 'next/headers';
+
+async function verifyRecaptcha(token: string) {
+  const secret = process.env.RECAPTCHA_SECRET_KEY || '';
+  if (!secret) return false;
+
+  const response = await fetch(
+    `https://www.google.com/recaptcha/api/siteverify?secret=${encodeURIComponent(secret)}&response=${encodeURIComponent(token)}`,
+    { method: 'POST' }
+  );
+
+  const data = await response.json();
+  return data?.success;
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await request.json();
+    const { email, password, recaptchaToken } = await request.json();
+
+    if (!recaptchaToken) {
+      return NextResponse.json({ error: 'Captcha no proporcionado' }, { status: 400 });
+    }
+
+    const isHuman = await verifyRecaptcha(recaptchaToken);
+    if (!isHuman) {
+      return NextResponse.json({ error: 'Captcha inválido' }, { status: 400 });
+    }
 
     const users = await query('SELECT * FROM usuarios WHERE email = ?', [email]);
     const user = (users as any[])[0];
