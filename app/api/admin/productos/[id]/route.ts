@@ -8,30 +8,46 @@ export async function PATCH(
 ) {
   console.log('PATCH request for product');
   const { id } = await params;
-  // TEMPORALMENTE QUITAR VERIFICACIÓN DE ADMIN
-  // const user = getUserFromRequest(request);
-  // console.log('User from request:', user);
-
-  // if (!user || (user as any).rol !== 'admin') {
-  //   console.log('User not authorized:', user);
-  //   return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
-  // }
 
   try {
     const body = await request.json();
     console.log('Request body:', body);
-    const { nombre, descripcion } = body;
+
+    const {
+      nombre,
+      descripcion,
+      tipo,
+      imagen_url,
+      unidad_medida,
+      precio_base,
+      stock_minimo
+    } = body;
 
     if (!nombre || !descripcion) {
-      return NextResponse.json({ error: 'Nombre y descripción son requeridos' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Nombre y descripción son requeridos' },
+        { status: 400 }
+      );
     }
 
     await query(
-      'UPDATE productos SET nombre = ?, descripcion = ? WHERE id = ?',
-      [nombre, descripcion, parseInt(id)]
+      `UPDATE productos 
+       SET nombre = ?, descripcion = ?, tipo = ?, imagen_url = ?, unidad_medida = ?, precio_base = ?, stock_minimo = ?
+       WHERE id = ?`,
+      [
+        nombre,
+        descripcion,
+        tipo,
+        imagen_url,
+        unidad_medida,
+        precio_base,
+        stock_minimo,
+        parseInt(id)
+      ]
     );
 
     return NextResponse.json({ message: 'Producto actualizado' });
+
   } catch (error) {
     console.error('Error al actualizar producto:', error);
     return NextResponse.json(
@@ -45,25 +61,13 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  console.log('DELETE request for product');
   const { id } = await params;
-  console.log('Product ID:', id);
-  // TEMPORALMENTE QUITAR VERIFICACIÓN DE ADMIN
-  // const user = getUserFromRequest(request);
-  // console.log('User from request:', user);
-
-  // if (!user || (user as any).rol !== 'admin') {
-  //   console.log('User not authorized:', user);
-  //   return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
-  // }
 
   try {
-    console.log('Executing query to deactivate product:', id);
     await query(
       'UPDATE productos SET activo = false WHERE id = ?',
       [parseInt(id)]
     );
-    console.log('Product deactivated successfully');
 
     return NextResponse.json({ message: 'Producto desactivado' });
   } catch (error) {
