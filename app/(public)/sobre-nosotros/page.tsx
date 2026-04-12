@@ -30,11 +30,11 @@ export default async function SobreNosotros() {
 
                     <div className="p-8 md:p-12">
                         <h2 className="text-2xl font-bold text-white mb-4">
-                            Mas de 20 años dando forma a tus ideas
+                            Mas de 10 años dando forma a tus ideas
                         </h2>
                         <p className="text-sm font-medium text-yellow-200 mb-6">{dbStatusText}</p>
                         <p className="text-gray-100 leading-relaxed mb-6">
-                            En <strong>El Vitral</strong> somos una empresa familiar con más de dos décadas de experiencia en el sector del vidrio y la cristalería. Nacimos con la pasión por transformar espacios a través de la luz y la transparencia, ofreciendo soluciones a medida para proyectos residenciales, comerciales e industriales.
+                            En <strong>El Vitral</strong> somos una empresa familiar con más de diez años de experiencia en el sector del vidrio y la cristalería. Nacimos con la pasión por transformar espacios a través de la luz y la transparencia, ofreciendo soluciones a medida para proyectos residenciales, comerciales e industriales.
                         </p>
 
                         <h3 className="text-xl font-bold text-white mb-3">Nuestra misión</h3>
@@ -63,7 +63,7 @@ export default async function SobreNosotros() {
 
                         <div className="bg-black/20 p-6 rounded-lg text-center mt-8"> 
                           <h4 className="text-lg font-semibold text-white mb-2">
-                            ¿Tienes un proyecto en mente?
+                            ¿Tienes un proyecto en mente? Cotiza con nosotros y hagamos realidad tu visión.
                           </h4>
                           <Link
                           href="/cotizar"
