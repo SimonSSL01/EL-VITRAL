@@ -1,4 +1,4 @@
-INSERT INTO `productos` (`id`, `nombre`, `tipo`, `descripcion`, `imagen_url`, `unidad_medida`, `precio_base`, `stock_minimo`, `activo`) VALUES
+INSERT INTO `productos` (`id`, `nombre`, `tipo`, `descripcion`, `imagen_url`, `unidad_medida`, `precio_base`, `stock`, `activo`) VALUES
 (203, 'Vidrio Claro 3mm', 'vidrio', 'Vidrio transparente de 3mm de espesor', 'https://media.istockphoto.com/id/2148805322/photo/glass-sheets-super-clear-float-glass-panels.jpg?s=612x612&w=0&k=20&c=4ICd6ne9n7J1WfBydbF5PU5SyqrGT1O9oPAasgvxNoo=', 'm2', 35000.00, 20, 1),
 (204, 'Vidrio Claro 4mm', 'vidrio', 'Vidrio transparente de 4mm de espesor', 'https://media.istockphoto.com/id/961823942/photo/sheets-of-factory-manufacturing-tempered-clear-float-glass-panels-cut-to-size.jpg?s=612x612&w=0&k=20&c=u3g9k-Ek1aCj6wvJQKsW66Xmhp97hrf35Af3qhKS8Ww=', 'm2', 45000.00, 20, 1),
 (205, 'Vidrio Claro 5mm', 'vidrio', 'Vidrio transparente de 5mm de espesor', 'https://media.istockphoto.com/id/2130497433/photo/glass-factory-produces-a-variety-of-transparent-glass-thicknesses.jpg?s=612x612&w=0&k=20&c=Uiyv5cqyHKEUsS_Gtcys56dfIEpFZHfJ1JY_LEnwpAk=', 'm2', 75000.00, 15, 1),

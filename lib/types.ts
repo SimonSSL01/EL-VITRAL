@@ -16,7 +16,7 @@ export interface Producto {
   imagen_url?: string;
   unidad_medida: string;
   precio_base: number;
-  stock_minimo: number;
+  stock: number;
   activo: boolean;
 }
 

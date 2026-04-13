@@ -4,7 +4,7 @@ import { getUserFromRequest } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   const user = getUserFromRequest(request);
-  if (!user || (user as any).rol !== 'admin') {
+  if (!user) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
   }
 

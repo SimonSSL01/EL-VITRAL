@@ -65,6 +65,10 @@ export default function AdminPage() {
             <h2 className="text-xl font-bold text-blue-300 mb-2">Gestionar Productos</h2>
             <p className="text-gray-300">Crear, editar y desactivar productos</p>
           </Link>
+          <Link href="/admin/inventario" className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow" style={{ backgroundColor: '#1e2939'}}>
+            <h2 className="text-xl font-bold text-blue-300 mb-2">Historial de Inventario</h2>
+            <p className="text-gray-300">Ver movimientos y registrar entradas</p>
+          </Link>
           <Link href="/admin/cotizaciones" className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow" style={{ backgroundColor: '#1e2939'}}>
             <h2 className="text-xl font-bold text-blue-300 mb-2">Ver Cotizaciones</h2>
             <p className="text-gray-300">Listado completo de cotizaciones</p>

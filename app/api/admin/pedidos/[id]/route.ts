@@ -5,7 +5,7 @@ import { getUserFromRequest } from '@/lib/auth';
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = getUserFromRequest(request);
 
-  if (!user || (user as any).rol !== 'admin') {
+  if (!user) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
   }
 

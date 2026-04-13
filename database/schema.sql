@@ -23,7 +23,7 @@ CREATE TABLE productos (
     imagen_url VARCHAR(255),
     unidad_medida VARCHAR(20),
     precio_base DECIMAL(10,2) NOT NULL,
-    stock_minimo INT DEFAULT 5,
+    stock INT DEFAULT 5,
     activo BOOLEAN DEFAULT true
 );
 

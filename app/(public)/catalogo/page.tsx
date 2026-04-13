@@ -155,6 +155,22 @@ export default function CatalogoPage() {
                         </div>
                     ))}
                 </div>
+
+                {/* Custom Footer Message */}
+                <div className="mt-16 p-8 rounded-lg text-center" style={{ backgroundColor: '#1e2939', borderLeft: '4px solid #3b82f6' }}>
+                    <p className="text-gray-100 text-lg mb-2">
+                        ¿No encuentras lo que estás buscando?
+                    </p>
+                    <p className="text-gray-100 text-lg mb-6">
+                        ¿Necesitas algo más personalizado?
+                    </p>
+                    <a 
+                        href="tel:+573137928483"
+                        className="inline-block bg-primary hover:bg-secondary text-blue-400 px-6 py-3 rounded-md font-semibold transition-colors"
+                    >
+                        📞 Llámanos: 3137928483
+                    </a>
+                </div>
             </div>
         </div>
     );

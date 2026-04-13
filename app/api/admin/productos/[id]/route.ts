@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { getUserFromRequest } from '@/lib/auth';
+import { getStockColumn } from '@/lib/productStock';
 
 export async function PATCH(
   request: NextRequest,
@@ -8,27 +9,34 @@ export async function PATCH(
 ) {
   console.log('PATCH request for product');
   const { id } = await params;
-  // TEMPORALMENTE QUITAR VERIFICACIÓN DE ADMIN
-  // const user = getUserFromRequest(request);
-  // console.log('User from request:', user);
+  const user = getUserFromRequest(request);
 
-  // if (!user || (user as any).rol !== 'admin') {
-  //   console.log('User not authorized:', user);
-  //   return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
-  // }
+  if (!user) {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
+  }
 
   try {
     const body = await request.json();
-    console.log('Request body:', body);
-    const { nombre, descripcion } = body;
+    const {
+      nombre,
+      descripcion,
+      tipo,
+      unidad_medida,
+      precio_base,
+      imagen_url,
+      stock,
+      activo,
+    } = body;
 
-    if (!nombre || !descripcion) {
-      return NextResponse.json({ error: 'Nombre y descripción son requeridos' }, { status: 400 });
+    if (!nombre || !descripcion || !tipo || !unidad_medida || precio_base == null || stock == null) {
+      return NextResponse.json({ error: 'Todos los campos son requeridos' }, { status: 400 });
     }
 
+    const stockColumn = await getStockColumn();
+
     await query(
-      'UPDATE productos SET nombre = ?, descripcion = ? WHERE id = ?',
-      [nombre, descripcion, parseInt(id)]
+      `UPDATE productos SET nombre = ?, descripcion = ?, tipo = ?, unidad_medida = ?, precio_base = ?, imagen_url = ?, ${stockColumn} = ?, activo = ? WHERE id = ?`,
+      [nombre, descripcion, tipo, unidad_medida, precio_base, imagen_url, stock, activo ? 1 : 0, parseInt(id)]
     );
 
     return NextResponse.json({ message: 'Producto actualizado' });
@@ -45,25 +53,18 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  console.log('DELETE request for product');
   const { id } = await params;
-  console.log('Product ID:', id);
-  // TEMPORALMENTE QUITAR VERIFICACIÓN DE ADMIN
-  // const user = getUserFromRequest(request);
-  // console.log('User from request:', user);
+  const user = getUserFromRequest(request);
 
-  // if (!user || (user as any).rol !== 'admin') {
-  //   console.log('User not authorized:', user);
-  //   return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
-  // }
+  if (!user) {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
+  }
 
   try {
-    console.log('Executing query to deactivate product:', id);
     await query(
       'UPDATE productos SET activo = false WHERE id = ?',
       [parseInt(id)]
     );
-    console.log('Product deactivated successfully');
 
     return NextResponse.json({ message: 'Producto desactivado' });
   } catch (error) {
