@@ -27,6 +27,7 @@ export default function CotizacionesPage() {
   const [selectedCotizacion, setSelectedCotizacion] = useState<Cotizacion | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [showPhoneModal, setShowPhoneModal] = useState(false);
 
   useEffect(() => {
     fetchCotizaciones();
@@ -47,31 +48,7 @@ export default function CotizacionesPage() {
   };
 
   const convertirAPedido = async (cotizacionId: number) => {
-    if (!confirm('¿Estás seguro de que quieres convertir esta cotización en pedido?')) {
-      return;
-    }
-
-    try {
-      const res = await fetch('/api/pedidos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          cotizacion_id: cotizacionId,
-          fecha_entrega: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 7 días después
-        })
-      });
-
-      if (res.ok) {
-        alert('Cotización convertida a pedido exitosamente');
-        fetchCotizaciones(); 
-      } else {
-        const error = await res.json();
-        alert(error.error || 'Error al convertir la cotización');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Error al conectar con el servidor');
-    }
+    setShowPhoneModal(true);
   };
 
   const verDetalles = async (codigo: string) => {
@@ -172,7 +149,7 @@ export default function CotizacionesPage() {
                             onClick={() => convertirAPedido(cotizacion.id)}
                             className="text-primary hover:text-secondary"
                           >
-                            Convertir a Pedido
+                            Llama para confirmar tu cotización
                           </button>
                         )}
                         <button
@@ -235,6 +212,36 @@ export default function CotizacionesPage() {
 
               <div className="text-right pt-4 border-t border-gray-700">
                 <p className="text-xl font-bold text-primary">Total: ${formatNumber(selectedCotizacion.total)}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showPhoneModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="rounded-lg shadow-xl max-w-md w-full mx-4" style={{ backgroundColor: '#1e2939'}}>
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold text-white">Confirmar Tu Cotización</h2>
+                <button onClick={() => setShowPhoneModal(false)} className="text-gray-400 hover:text-gray-200 text-2xl">×</button>
+              </div>
+
+              <div className="text-center py-8">
+                <p className="text-gray-300 mb-6 text-lg">Para confirmar tu cotización, por favor llama al siguiente número:</p>
+                <div className="bg-primary bg-opacity-20 border border-primary rounded-lg p-6 mb-6">
+                  <p className="text-4xl font-bold text-primary">3137928483</p>
+                </div>
+                <p className="text-gray-400 text-sm">Nuestro equipo está disponible para asistirte</p>
+              </div>
+
+              <div className="flex gap-2 justify-end">
+                <button
+                  onClick={() => setShowPhoneModal(false)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
+                >
+                  Cerrar
+                </button>
               </div>
             </div>
           </div>

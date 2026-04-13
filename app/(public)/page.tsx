@@ -21,7 +21,6 @@ export default function LandingPage() {
   };
 
   const handleBuscar = () => {
-    // Redirigir al catálogo con los filtros aplicados
     const params = new URLSearchParams();
     if (filtros.tipoVidrio) params.set('tipo', filtros.tipoVidrio);
     if (filtros.aplicacion) params.set('aplicacion', filtros.aplicacion);

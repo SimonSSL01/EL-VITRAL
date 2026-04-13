@@ -38,7 +38,6 @@ export async function POST(request: NextRequest) {
     if (user.password && user.password.startsWith('$2')) {
       valid = await comparePassword(password, user.password);
     } else {
-      // Usuario creado manualmente con contraseña en texto plano (p.ej. phpMyAdmin)
       valid = password === user.password;
       if (valid) {
         const hashed = await hashPassword(password);

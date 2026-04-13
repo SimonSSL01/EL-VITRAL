@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { getUserFromRequest } from '@/lib/auth';
+import { getUserFromRequest, isAdmin } from '@/lib/auth';
 
 export async function PATCH(
   request: NextRequest,
@@ -10,7 +10,7 @@ export async function PATCH(
   const { id } = await params;
   const user = getUserFromRequest(request);
 
-  if (!user) {
+  if (!user || !isAdmin(user)) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
   }
 

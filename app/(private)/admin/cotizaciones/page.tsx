@@ -30,6 +30,7 @@ export default function AdminCotizacionesPage() {
   const [error, setError] = useState('');
   const [selectedCotizacion, setSelectedCotizacion] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
+  const [convertingId, setConvertingId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchCotizaciones();
@@ -82,6 +83,38 @@ export default function AdminCotizacionesPage() {
   const closeModal = () => {
     setShowModal(false);
     setSelectedCotizacion(null);
+  };
+
+  const convertirAPedido = async (cotizacionId: number) => {
+    if (!confirm('¿Estás seguro de que quieres convertir esta cotización en pedido?')) {
+      return;
+    }
+
+    setConvertingId(cotizacionId);
+    try {
+      const res = await fetch('/api/pedidos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cotizacion_id: cotizacionId,
+          fecha_entrega: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        })
+      });
+
+      if (res.ok) {
+        alert('Cotización convertida a pedido exitosamente');
+        closeModal();
+        fetchCotizaciones();
+      } else {
+        const error = await res.json();
+        alert(error.error || 'Error al convertir la cotización');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al conectar con el servidor');
+    } finally {
+      setConvertingId(null);
+    }
   };
 
   if (loading) {
@@ -272,6 +305,24 @@ export default function AdminCotizacionesPage() {
               </div>
               <div className="text-right pt-4 border-t border-gray-700">
                 <p className="text-xl font-bold text-primary">Total: ${formatNumber(selectedCotizacion.total)}</p>
+              </div>
+
+              <div className="mt-4 flex gap-2 justify-end">
+                {selectedCotizacion.estado !== 'convertida' && (
+                  <button
+                    onClick={() => convertirAPedido(selectedCotizacion.id)}
+                    disabled={convertingId === selectedCotizacion.id}
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors disabled:bg-gray-500"
+                  >
+                    {convertingId === selectedCotizacion.id ? 'Convirtiendo...' : 'Convertir a Pedido'}
+                  </button>
+                )}
+                <button
+                  onClick={closeModal}
+                  className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition-colors"
+                >
+                  Cerrar
+                </button>
               </div>
             </div>
           </div>

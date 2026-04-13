@@ -6,7 +6,6 @@ export async function POST(request: NextRequest) {
   try {
     const { nombre, email, password, telefono, direccion } = await request.json();
 
-    // Verifica si el email ya esta registrado en la db
     const existing = await query('SELECT id FROM usuarios WHERE email = ?', [email]);
     if ((existing as any[]).length > 0) {
       return NextResponse.json({ error: 'El email ya está registrado' }, { status: 400 });

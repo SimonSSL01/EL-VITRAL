@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { getUserFromRequest } from '@/lib/auth';
+import { getUserFromRequest, isAdmin } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   const user = getUserFromRequest(request);
-  if (!user) {
+  if (!user || !isAdmin(user)) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
   }
   const usuarios = await query('SELECT id, nombre, email, telefono, direccion, rol, aprobado FROM usuarios');
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   const user = getUserFromRequest(request);
-  if (!user) {
+  if (!user || !isAdmin(user)) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
   }
   const { id } = await request.json();

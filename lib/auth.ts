@@ -30,3 +30,7 @@ export const getUserFromRequest = (req: NextRequest) => {
   if (!token) return null;
   return verifyToken(token);
 };
+
+export const isAdmin = (user: any) => {
+  return user && user.rol === 'admin';
+};

@@ -12,7 +12,7 @@ function calcularPrecio(producto: any, datos: any): number {
     const largo = Number(datos.medida_largo || 0);
     const ancho = Number(datos.medida_ancho || 0);
     if (largo <= 0 || ancho <= 0) return 0;
-    const area = (largo * ancho) / 10000; // cm² a m²
+    const area = (largo * ancho) / 10000; 
     return precioBase * area * cantidad;
   }
 

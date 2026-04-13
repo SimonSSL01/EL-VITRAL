@@ -213,6 +213,7 @@ export default function AdminProductosPage() {
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Producto</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Descripción</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Stock</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Acciones</th>
                   </tr>
                 </thead>
@@ -231,6 +232,7 @@ export default function AdminProductosPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-gray-300">{producto.descripcion}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-white font-medium">{producto.stock}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <button
                           onClick={() => openEditor(producto)}

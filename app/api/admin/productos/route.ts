@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { getUserFromRequest } from '@/lib/auth';
+import { getUserFromRequest, isAdmin } from '@/lib/auth';
 import { getStockColumn } from '@/lib/productStock';
 
 export async function GET(request: NextRequest) {
   const user = getUserFromRequest(request);
 
-  if (!user) {
+  if (!user || !isAdmin(user)) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
   }
 
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const user = getUserFromRequest(request);
 
-  if (!user) {
+  if (!user || !isAdmin(user)) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
   }
 

@@ -10,6 +10,7 @@ interface Producto {
   precio_base: number;
   unidad_medida: string;
   grosor?: number;
+  stock: number;
 }
 
 interface ItemCotizacion {
@@ -80,11 +81,11 @@ export default function CotizarPage() {
   const calcularPrecio = (producto: Producto, datos: any): number => {
     const precioBase = producto.precio_base;
     if (producto.tipo === 'vidrio' || producto.tipo === 'espejo') {
-      const area = (parseFloat(datos.medida_largo) * parseFloat(datos.medida_ancho)) / 10000; // Convertir cm² a m²
+      const area = (parseFloat(datos.medida_largo) * parseFloat(datos.medida_ancho)) / 10000; 
       return precioBase * area * datos.cantidad;
     }
     if (producto.tipo === 'aluminio') {
-      return precioBase * (parseFloat(datos.medida_largo) / 100) * datos.cantidad; // precio por metro lineal
+      return precioBase * (parseFloat(datos.medida_largo) / 100) * datos.cantidad; 
     }
     return precioBase * datos.cantidad;
   };
@@ -102,6 +103,11 @@ export default function CotizarPage() {
 
     if (producto.tipo === 'aluminio' && !productoActual.medida_largo) {
       alert('Para aluminio debe ingresar el largo');
+      return;
+    }
+
+    if (productoActual.cantidad > producto.stock) {
+      alert(`No puedes pedir más de ${producto.stock} unidades disponibles en stock`);
       return;
     }
 
@@ -212,7 +218,7 @@ export default function CotizarPage() {
           <div className="bg-green-900/30 border border-green-500 p-6 rounded-md text-center">
             <p className="text-xl text-white mb-4">Tu código de cotización es:</p>
             <p className="text-4xl font-mono font-bold text-primary">{resultado.codigo}</p>
-            <p className="text-gray-300 mt-4">Guarda este código para consultar tu cotización más tarde y recuerda que tienes que convertir la cotización en un pedido para proceder con la compra.</p>
+            <p className="text-gray-300 mt-4">Recuerda que tienes que llamar al "3137928483" para convertir la cotización en un pedido para proceder con la compra.</p>
           </div>
           <button
             onClick={() => router.push('/catalogo')}
@@ -282,12 +288,20 @@ export default function CotizarPage() {
                 >
                   <option value="">Seleccionar producto</option>
                   {productos.map(p => (
-                    <option key={p.id} value={p.id}>{p.nombre}</option>
+                    <option key={p.id} value={p.id}>{p.nombre} - Stock: {p.stock}</option>
                   ))}
                 </select>
 
                 {productoActual.producto_id && (
                   <>
+                    {(() => {
+                      const producto = productos.find(p => p.id === parseInt(productoActual.producto_id));
+                      return (
+                        <div className="bg-blue-900/30 border border-blue-500 rounded-md p-2">
+                          <p className="text-blue-300 text-sm"><strong>Stock disponible:</strong> {producto?.stock} unidades</p>
+                        </div>
+                      );
+                    })()}
                     <input
                       type="number"
                       placeholder="Largo (cm)"
@@ -311,8 +325,15 @@ export default function CotizarPage() {
                       type="number"
                       placeholder="Cantidad"
                       min="1"
+                      max={(() => {
+                        const producto = productos.find(p => p.id === parseInt(productoActual.producto_id));
+                        return producto?.stock || 1;
+                      })()}
                       value={productoActual.cantidad}
-                      onChange={(e) => setProductoActual({...productoActual, cantidad: parseInt(e.target.value)})}
+                      onChange={(e) => setProductoActual({...productoActual, cantidad: Math.min(parseInt(e.target.value) || 1, (() => {
+                        const producto = productos.find(p => p.id === parseInt(productoActual.producto_id));
+                        return producto?.stock || 1;
+                      })())})}
                       className="px-4 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-gray-800 text-white placeholder-gray-400"
                     />
                   </>
