@@ -60,74 +60,88 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      {/* Header con logo/imagen de fondo sutil */}
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 pointer-events-none"></div>
+
+      <div className="relative sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="mb-8 text-center">
+          <div className="mx-auto h-16 w-16 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center shadow-lg">
+            <span className="material-symbols-outlined text-2xl text-white">account_circle</span>
+          </div>
+          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900 dark:text-white">
+            Bienvenido de vuelta
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+            Inicia sesión en tu cuenta para continuar
+          </p>
+        </div>
+
         <div className="mb-4 text-center">
           <Link
             href="/"
-            className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors"
+            className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors duration-200"
           >
             <span className="material-symbols-outlined text-base mr-1">arrow_back</span>
             Volver al inicio
           </Link>
         </div>
-
-        <h2 className="text-center text-3xl font-extrabold text-primary">
-          Iniciar Sesión
-        </h2>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        
-        <div className="bg-white dark:bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          
+      <div className="relative mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg py-8 px-6 shadow-2xl sm:rounded-2xl sm:px-10 border border-white/20 dark:border-gray-700/50">
+
           <form className="space-y-6" onSubmit={handleSubmit}>
-            
+
             {error && (
-              <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded text-center">
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-xl text-center text-sm">
+                <span className="material-symbols-outlined text-base mr-2">error</span>
                 {error}
               </div>
             )}
             {success && (
-              <div className="bg-green-50 border border-green-400 text-green-700 px-4 py-3 rounded text-center">
+              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 px-4 py-3 rounded-xl text-center text-sm">
+                <span className="material-symbols-outlined text-base mr-2">check_circle</span>
                 {success}
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                <span className="material-symbols-outlined text-base mr-2 align-middle">email</span>
                 Correo electrónico
               </label>
-              <div className="mt-1">
+              <div className="relative">
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm 
+                  className="w-full pl-4 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm
                   placeholder-gray-400 dark:placeholder-gray-500
-                  focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary 
-                  sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary
+                  sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200"
+                  placeholder="tu@email.com"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                <span className="material-symbols-outlined text-base mr-2 align-middle">lock</span>
                 Contraseña
               </label>
-              <div className="mt-1">
+              <div className="relative">
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm 
+                  className="w-full pl-4 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm
                   placeholder-gray-400 dark:placeholder-gray-500
-                  focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary 
-                  sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary
+                  sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200"
+                  placeholder="••••••••"
                 />
               </div>
             </div>
@@ -137,27 +151,29 @@ export default function LoginPage() {
               <div className="text-sm">
                 <Link
                   href="/olvide-password"
-                  className="font-medium text-primary hover:text-secondary"
+                  className="font-medium text-primary hover:text-secondary transition-colors duration-200"
                 >
                   ¿Olvidaste tu contraseña?
                 </Link>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Captcha
+            <div className="space-y-3">
+              <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <span className="material-symbols-outlined text-base mr-2 align-middle">security</span>
+                Verificación de seguridad
               </div>
               {siteKey ? (
-                <div className="flex justify-center">
+                <div className="flex justify-center bg-white rounded-xl p-4 border border-gray-200">
                   <ReCAPTCHA
                     sitekey={siteKey}
                     onChange={(token) => setRecaptchaToken(token)}
                   />
                 </div>
               ) : (
-                <div className="rounded-md border border-yellow-400 bg-yellow-50 px-4 py-3 text-yellow-800">
-                  Captcha no configurado. Añade <code>NEXT_PUBLIC_RECAPTCHA_SITE_KEY</code> en tu archivo de entorno.
+                <div className="rounded-xl border border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20 px-4 py-3 text-yellow-800 dark:text-yellow-400 text-sm">
+                  <span className="material-symbols-outlined text-base mr-2 align-middle">warning</span>
+                  Captcha no configurado. Añade <code className="bg-yellow-100 dark:bg-yellow-800 px-1 rounded">NEXT_PUBLIC_RECAPTCHA_SITE_KEY</code> en tu archivo de entorno.
                 </div>
               )}
             </div>
@@ -166,12 +182,22 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading || !siteKey}
-                className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white 
-                bg-primary hover:bg-secondary 
-                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary 
-                disabled:opacity-50 transition"
+                className="w-full flex justify-center items-center py-3 px-4 rounded-xl shadow-lg text-sm font-semibold text-white
+                bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90
+                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary
+                disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
               >
-                {loading ? 'Iniciando...' : 'Iniciar Sesión'}
+                {loading ? (
+                  <>
+                    <span className="material-symbols-outlined animate-spin mr-2">refresh</span>
+                    Iniciando...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined mr-2">login</span>
+                    Iniciar Sesión
+                  </>
+                )}
               </button>
             </div>
 
@@ -180,9 +206,9 @@ export default function LoginPage() {
                 ¿No tienes cuenta?{' '}
                 <Link
                   href="/registro"
-                  className="font-medium text-primary hover:text-secondary"
+                  className="font-semibold text-primary hover:text-secondary transition-colors duration-200"
                 >
-                  Regístrate
+                  Regístrate aquí
                 </Link>
               </p>
             </div>

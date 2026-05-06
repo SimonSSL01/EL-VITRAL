@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import NavBar from '@/components/NavBar';
 
 interface Cotizacion {
@@ -12,6 +13,13 @@ interface Cotizacion {
   total: number;
   estado: string;
   codigo_unico: string;
+  detalles?: Array<{
+    descripcion: string;
+    medida_largo?: number;
+    medida_ancho?: number;
+    cantidad: number;
+    subtotal: number;
+  }>;
 }
 
 const formatNumber = (value: number): string => {
@@ -88,7 +96,10 @@ export default function CotizacionesPage() {
         {cotizaciones.length === 0 ? (
           <div className="rounded-lg p-10 text-center" style={{ backgroundColor: '#1e2939'}}>
             <p className="text-gray-300 text-lg">No tienes cotizaciones realizadas</p>
-          </div>
+          <Link href="/catalogo" className="inline-block mt-4 bg-primary text-blue-400 px-6 py-2 rounded-md hover:bg-secondary transition-colors">
+              Explorar productos
+          </Link>
+        </div>
         ) : (
           <div className="rounded-lg shadow-md overflow-hidden" style={{ backgroundColor: '#1e2939'}}>
             <div className="overflow-x-auto">

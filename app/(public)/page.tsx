@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import NavBar from '@/components/NavBar';
+import ReviewsCarousel from '@/components/ReviewsCarousel';
+import LocationSection from '@/components/LocationSection';
 import { useRouter } from 'next/navigation';
 
 export default function LandingPage() {
@@ -197,6 +199,12 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Carrusel de reseñas */}
+      <ReviewsCarousel />
+
+      {/* Sección de ubicación */}
+      <LocationSection />
     </>
   );
 }
