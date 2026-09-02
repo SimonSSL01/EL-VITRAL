@@ -24,12 +24,6 @@ const options = {
         }
       }
     },
-    // Nota: NO se define un `security` global aquí a propósito.
-    // Cada operación en index.js declara su propio bloque `security: - bearerAuth: []`
-    // solo si el endpoint realmente lo requiere. Si se pone un default global,
-    // Swagger UI muestra el candado en TODAS las rutas (incluidas las públicas
-    // como /api/auth/register, /api/auth/login y /api/productos), aunque el
-    // backend no les exija token.
   },
   apis: ['./index.js'],
 };

@@ -294,10 +294,7 @@ export default function CotizarPage() {
           <h2 className="text-2xl font-bold text-white mb-2">¡Cotización creada!</h2>
           <p className="text-gray-400 text-xs mb-6">Tu oferta ha sido registrada de manera exitosa en el sistema.</p>
           
-          <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-5 mb-6">
-            <span className="text-xs uppercase tracking-wider text-emerald-400 font-semibold block mb-1">Código de cotización</span>
-            <span className="text-4xl font-extrabold text-white tracking-wider">{resultado.codigo}</span>
-          </div>
+        
 
           <p className="text-gray-400 text-xs mb-6">
             Ponte en contacto al <span className="text-cyan-400 font-semibold">3137928483</span> para procesar tu pedido.

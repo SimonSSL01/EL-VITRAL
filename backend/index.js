@@ -37,12 +37,12 @@ const {
 } = require('./lib/auth.js');
 const { createPasswordResetToken, sendPasswordResetEmail } = require('./lib/email.js');
 const { notifyOrderCreated, notifyOrderStateChange, notifyAppointment, notifyStockMovement, notifyPaymentReceived } = require('./lib/notifications.js');
+const { checkRate, rateLimitError, getClientIp } = require('./lib/rateLimit.js');
 
 const port = process.env.PORT || 4000;
 const isProduction = process.env.NODE_ENV === 'production';
 const COP_CURRENCY = 'cop';
-// COP is a two-decimal currency in Stripe's API: $10.000 COP must be sent as
-// 1.000.000 minor units, not as 10.000.
+
 const COP_MINOR_UNIT_MULTIPLIER = 100;
 const MINIMUM_QUOTE_TOTAL_COP = 10000;
 
@@ -61,7 +61,6 @@ function getPaymentAmountInCop(total, currentPaymentStatus, paymentType) {
   }
 
   if (paymentType === 'pagado') {
-    // A customer who already paid the deposit only pays the outstanding balance.
     return currentPaymentStatus === 'anticipo'
       ? normalizedTotal - Math.round(normalizedTotal / 2)
       : currentPaymentStatus === 'pendiente'
@@ -72,7 +71,6 @@ function getPaymentAmountInCop(total, currentPaymentStatus, paymentType) {
   return null;
 }
 
-// Crear app Express solo para Swagger
 const expressApp = express();
 expressApp.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
   customCss: '.swagger-ui .topbar { display: none }',
@@ -904,13 +902,6 @@ async function parseBody(req) {
   });
 }
 
-// La cookie únicamente contiene un identificador de sesión opaco (sid).
-// El token real (JWT) se guarda exclusivamente en el servidor, de modo que
-// aunque se inspeccionen las cookies del navegador no hay ningún token visible.
-//
-// Para eliminar restos de versiones anteriores, también se expiran las
-// cookies viejas "accessToken" y "token" que pudieran haber quedado guardadas
-// en el navegador en sesiones previas.
 function expiredCookie(name) {
   const parts = [`${name}=; Path=/`, 'Expires=Thu, 01 Jan 1970 00:00:00 GMT', 'SameSite=Lax'];
   if (isProduction) {
@@ -1064,7 +1055,6 @@ async function handleRequest(req, res) {
   const pathname = url.pathname;
   const method = req.method;
 
-  // Si es una ruta de Swagger, dejarla pasar a Express
   if (pathname.startsWith('/api-docs')) {
     return expressApp(req, res);
   }
@@ -1124,6 +1114,12 @@ async function handleRequest(req, res) {
     // ===== LOGIN =====
     if (pathname === '/api/auth/login' && method === 'POST') {
       const body = await parseBody(req);
+      const ip = getClientIp(req);
+      const rateCheck = checkRate('login', ip, body?.email || '');
+      if (!rateCheck.allowed) {
+        return sendJSON(res, 429, rateLimitError('login'));
+      }
+
       const email = sanitizeEmail(body.email);
       const password = sanitizeString(body.password);
 
@@ -1153,8 +1149,6 @@ async function handleRequest(req, res) {
       const { sid } = createSession({ id: user.id, rol: user.rol, nombre: user.nombre, email: user.email });
       res.setHeader('Set-Cookie', createSessionCookies(sid));
 
-      // NOTA: El token NUNCA se devuelve al frontend. Solo se envía un sid opaco
-      // en una cookie HttpOnly; el JWT queda únicamente en el servidor.
       return sendJSON(res, 200, {
         message: 'Inicio de sesion exitoso',
         user: {
@@ -1169,6 +1163,12 @@ async function handleRequest(req, res) {
     // ===== GOOGLE LOGIN / REGISTER =====
     if (pathname === '/api/auth/google' && method === 'POST') {
       const body = await parseBody(req);
+      const ip = getClientIp(req);
+      const rateCheck = checkRate('google', ip, '');
+      if (!rateCheck.allowed) {
+        return sendJSON(res, 429, rateLimitError('google'));
+      }
+
       const credential = body.credential;
 
       if (!credential) {
@@ -1229,6 +1229,12 @@ async function handleRequest(req, res) {
     // ===== FORGOT PASSWORD =====
     if (pathname === '/api/auth/forgot-password' && method === 'POST') {
       const body = await parseBody(req);
+      const ip = getClientIp(req);
+      const rateCheck = checkRate('forgot', ip, '');
+      if (!rateCheck.allowed) {
+        return sendJSON(res, 429, rateLimitError('forgot'));
+      }
+
       const email = sanitizeEmail(body.email);
 
       if (!email) {
@@ -1315,10 +1321,7 @@ async function handleRequest(req, res) {
       return sendJSON(res, 200, { message: 'Sesión cerrada' });
     }
 
-    // ===== REFRESH (renovar sesión opaca) =====
-    // La sesión vive en el servidor y se renueva de forma implícita (sliding
-    // expiration) con cada petición autenticada. Este endpoint simplemente
-    // reemite la cookie para mantenerla al día y devuelve el usuario.
+    // ===== REFRESH (renovar sesión) =====
     if (pathname === '/api/auth/refresh' && method === 'POST') {
       const cookies = parseCookies(req.headers.cookie || '');
       const session = getSession(cookies.sid);
@@ -1336,7 +1339,6 @@ async function handleRequest(req, res) {
       if (!user.activo) return sendJSON(res, 403, { error: 'Cuenta inactiva' });
       if (!user.aprobado) return sendJSON(res, 403, { error: 'Cuenta en espera de aprobación' });
 
-      // Recrear sesión para rotar el sid y el token interno.
       deleteSession(cookies.sid);
       const { sid } = createSession({ id: user.id, rol: user.rol, nombre: user.nombre, email: user.email });
       res.setHeader('Set-Cookie', createSessionCookies(sid));
@@ -2171,7 +2173,6 @@ async function handleRequest(req, res) {
           headers: {
             'Authorization': `Bearer ${stripeSecret}`,
             'Content-Type': 'application/x-www-form-urlencoded',
-            // Prevent duplicated checkout sessions when a user clicks twice.
             'Idempotency-Key': `pedido-${pedidoId}-${pedido.pago || 'pendiente'}-${tipoPago}`,
           },
           body: params.toString()
@@ -2225,7 +2226,6 @@ async function handleRequest(req, res) {
         return sendJSON(res, 400, { error: 'Datos de pago faltantes o inválidos' });
       }
 
-      // Check if order exists and user is authorized
       const rows = await query('SELECT * FROM pedidos WHERE id = ?', [pedidoId]);
       if (!Array.isArray(rows) || rows.length === 0) {
         return sendJSON(res, 404, { error: 'Pedido no encontrado' });
@@ -2239,7 +2239,6 @@ async function handleRequest(req, res) {
         return sendJSON(res, 400, { error: 'El pedido ya se encuentra totalmente pagado' });
       }
 
-      // Verify with Stripe
       try {
         const stripeSecret = process.env.STRIPE_SECRET_KEY;
         if (!stripeSecret) {
@@ -2331,8 +2330,6 @@ async function handleRequest(req, res) {
 
       const pedido = formatNumericRow(pedidoRows[0]);
 
-      // Los ID de usuario son UUID (VARCHAR), por lo que convertirlos a número
-      // los transforma en NaN y termina rechazando al propietario del pedido.
       if (String(pedido.usuario_id) !== String(userData.id)) {
         return sendJSON(res, 403, { error: 'No autorizado' });
       }

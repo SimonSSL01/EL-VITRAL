@@ -2,7 +2,19 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
+function resolveSecret(name) {
+  const value = process.env[name];
+  if (value && value.length >= 16) {
+    return value;
+  }
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(`${name} no está configurado. Debe definirse en producción.`);
+  }
+  console.warn(`AVISO: ${name} no configurado. Usando secreto aleatorio efímero en desarrollo.`);
+  return crypto.randomBytes(32).toString('hex');
+}
+
+const JWT_SECRET = resolveSecret('JWT_SECRET');
 
 function hashPassword(password) {
   return bcrypt.hash(password, 10);
@@ -25,16 +37,7 @@ function sanitizeEmail(value) {
   return email;
 }
 
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'your-super-secret-refresh-key';
-
-// ============================================================================
-// Sesiones opacas en servidor
-// ----------------------------------------------------------------------------
-// El JWT NUNCA se envía al navegador. En el navegador solo hay una cookie
-// "sid" opaca (un identificador aleatorio sin significado). El mapeo sid ->
-// usuario/token vive únicamente en el servidor, por lo que aunque se
-// inspeccionen las cookies del navegador no se puede ver ningún token.
-// ============================================================================
+const JWT_REFRESH_SECRET = resolveSecret('JWT_REFRESH_SECRET');
 
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 días (sliding expiration)
 const sessions = new Map();
@@ -150,12 +153,8 @@ function getUserFromRequest(req) {
     const cookies = parseCookies(req.headers.cookie || '');
     const session = getSession(cookies.sid);
     if (session) {
-      // El token vive en el servidor; aquí solo se verifica que siga siendo
-      // válido para devolver los datos del usuario.
       user = verifyAccessToken(session.accessToken);
       if (!user) {
-        // El token interno expiró pero la sesión sigue viva: regenerar el JWT
-        // en el servidor sin intervención del navegador.
         session.accessToken = generateAccessToken({
           id: session.userId,
           rol: session.rol,
@@ -170,11 +169,12 @@ function getUserFromRequest(req) {
   }
   if (user) return user;
 
-  // 2. Fallback: Bearer Token (solo para Swagger / integraciones externas)
-  const tokenFromBearer = extractBearerToken(req);
-  if (tokenFromBearer) {
-    const decoded = verifyAccessToken(tokenFromBearer);
-    if (decoded) return decoded;
+  if (process.env.ALLOW_BEARER_AUTH === 'true') {
+    const tokenFromBearer = extractBearerToken(req);
+    if (tokenFromBearer) {
+      const decoded = verifyAccessToken(tokenFromBearer);
+      if (decoded) return decoded;
+    }
   }
 
   return null;
