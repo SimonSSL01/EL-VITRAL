@@ -964,9 +964,10 @@ function calculatePrice(product, item) {
   let subtotal = 0;
 
   if (['vidrio', 'espejo'].includes(product.tipo)) {
-    const area = (medida_largo * medida_ancho) / 10000;
-    subtotal = precioBase * area * cantidad;
-    precioUnitario = precioBase * area;
+    const largoRedondeado = Math.ceil(medida_largo / 10) * 10;
+    const anchoRedondeado = Math.ceil(medida_ancho / 10) * 10;
+    precioUnitario = (largoRedondeado * anchoRedondeado * precioBase) / 10;
+    subtotal = precioUnitario * cantidad;
   } else if (product.tipo === 'aluminio') {
     subtotal = precioBase * (medida_largo / 100) * cantidad;
     precioUnitario = precioBase * (medida_largo / 100);

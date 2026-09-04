@@ -41,7 +41,7 @@ describe('Cotizacion - POST /api/cotizaciones', () => {
           id: 10,
           nombre: 'Vidrio templado',
           tipo: 'vidrio',
-          precio_base: 100000,
+          precio_base: 100,
         },
       ])
       .mockResolvedValueOnce({ insertId: 55 })
@@ -226,7 +226,7 @@ describe('Cotizacion - POST /api/cotizaciones', () => {
           id: 10,
           nombre: 'Vidrio templado',
           tipo: 'vidrio',
-          precio_base: 100000,
+          precio_base: 100,
         },
       ])
       .mockResolvedValueOnce({ insertId: 55 })
@@ -267,7 +267,7 @@ describe('Cotizacion - POST /api/cotizaciones', () => {
           id: 10,
           nombre: 'Vidrio templado',
           tipo: 'vidrio',
-          precio_base: 100000,
+          precio_base: 100,
         },
       ])
       .mockResolvedValueOnce({ insertId: 55 })
@@ -315,7 +315,7 @@ describe('Cotizacion - POST /api/cotizaciones', () => {
           id: 10,
           nombre: 'Vidrio templado',
           tipo: 'vidrio',
-          precio_base: 100000,
+          precio_base: 100,
         },
       ])
       .mockResolvedValueOnce({ insertId: 55 })

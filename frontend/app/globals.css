@@ -46,6 +46,18 @@ select option {
   color: black;
 }
 
+/* Ocultar los botones de subir/bajar de los campos numéricos
+   (el usuario escribe la cantidad directamente) */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 .dark select option {
   background-color: white; 
   color: black; 

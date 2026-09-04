@@ -116,14 +116,35 @@ export default function CotizarPage() {
   const calcularPrecio = (producto: Producto, datos: { cantidad: number, medida_largo?: number, medida_ancho?: number }): number => {
     const precioBase = producto.precio_base;
     if (producto.tipo === 'vidrio' || producto.tipo === 'espejo') {
-      const area = (datos.medida_largo && datos.medida_ancho) ? (datos.medida_largo * datos.medida_ancho) / 10000 : 0;
-      return precioBase * area * datos.cantidad;
+      if (!datos.medida_largo || !datos.medida_ancho) return 0;
+      const largoRedondeado = Math.ceil(datos.medida_largo / 10) * 10;
+      const anchoRedondeado = Math.ceil(datos.medida_ancho / 10) * 10;
+      return (largoRedondeado * anchoRedondeado * precioBase) / 10 * datos.cantidad;
     }
     if (producto.tipo === 'aluminio') {
       const largo = datos.medida_largo || 0;
       return precioBase * (largo / 100) * datos.cantidad;
     }
     return precioBase * datos.cantidad;
+  };
+
+  const requiereLargo = (tipo: string) => tipo === 'vidrio' || tipo === 'espejo' || tipo === 'aluminio';
+  const requiereAncho = (tipo: string) => tipo === 'vidrio' || tipo === 'espejo';
+
+  const cantidadMaxima = (): number => {
+    const producto = productos.find(p => p.id === parseInt(productoActual.producto_id));
+    return producto?.stock ?? 1;
+  };
+
+  const cambiarCantidad = (valor: string) => {
+    const numero = parseInt(valor) || 1;
+    const max = cantidadMaxima();
+    if (numero > max) {
+      showModal(`La cantidad máxima disponible es ${max}.`);
+      setProductoActual({ ...productoActual, cantidad: max });
+    } else {
+      setProductoActual({ ...productoActual, cantidad: numero });
+    }
   };
 
   const agregarItem = () => {
@@ -146,7 +167,7 @@ export default function CotizarPage() {
     }
 
     if (productoActual.cantidad > producto.stock) {
-      showModal(`No puedes pedir más de ${producto.stock} unidades disponibles en stock.`);
+      showModal(`La cantidad máxima disponible es ${producto.stock}.`);
       return;
     }
 
@@ -156,13 +177,20 @@ export default function CotizarPage() {
       medida_ancho: parseFloat(productoActual.medida_ancho) || undefined
     });
 
+    const medidaLargo = (producto.tipo === 'vidrio' || producto.tipo === 'espejo') && productoActual.medida_largo
+      ? Math.ceil(parseFloat(productoActual.medida_largo) / 10) * 10
+      : parseFloat(productoActual.medida_largo) || undefined;
+    const medidaAncho = (producto.tipo === 'vidrio' || producto.tipo === 'espejo') && productoActual.medida_ancho
+      ? Math.ceil(parseFloat(productoActual.medida_ancho) / 10) * 10
+      : parseFloat(productoActual.medida_ancho) || undefined;
+
     setItems([...items, {
       producto_id: producto.id,
       nombre: producto.nombre,
       tipo: producto.tipo,
       cantidad: productoActual.cantidad,
-      medida_largo: parseFloat(productoActual.medida_largo) || undefined,
-      medida_ancho: parseFloat(productoActual.medida_ancho) || undefined,
+      medida_largo: medidaLargo,
+      medida_ancho: medidaAncho,
       precio
     }]);
 
@@ -180,7 +208,28 @@ export default function CotizarPage() {
     const item = nuevosItems[index];
     if (!item) return;
 
-    (item as any)[campo] = valor;
+    if (campo === 'cantidad') {
+      const producto = productos.find(p => p.id === item.producto_id);
+      const numero = parseInt(valor) || 1;
+      const max = producto?.stock ?? 1;
+      if (numero > max) {
+        showModal(`La cantidad máxima disponible es ${max}.`);
+        item.cantidad = max;
+      } else {
+        item.cantidad = numero;
+      }
+    } else {
+      (item as any)[campo] = valor;
+    }
+
+    if (item.tipo === 'vidrio' || item.tipo === 'espejo') {
+      if (campo === 'medida_largo' && item.medida_largo) {
+        item.medida_largo = Math.ceil(Number(item.medida_largo) / 10) * 10;
+      }
+      if (campo === 'medida_ancho' && item.medida_ancho) {
+        item.medida_ancho = Math.ceil(Number(item.medida_ancho) / 10) * 10;
+      }
+    }
 
     if (campo === 'cantidad' || campo === 'medida_largo' || campo === 'medida_ancho') {
       const producto = productos.find(p => p.id === item.producto_id);
@@ -382,7 +431,17 @@ export default function CotizarPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                 <select
                   value={productoActual.producto_id}
-                  onChange={(e) => setProductoActual({...productoActual, producto_id: e.target.value})}
+                  onChange={(e) => {
+                    const nuevoId = e.target.value;
+                    const nuevoProducto = productos.find(p => p.id === parseInt(nuevoId));
+                    const nuevoTipo = nuevoProducto?.tipo || '';
+                    setProductoActual({
+                      ...productoActual,
+                      producto_id: nuevoId,
+                      medida_largo: requiereLargo(nuevoTipo) ? productoActual.medida_largo : '',
+                      medida_ancho: requiereAncho(nuevoTipo) ? productoActual.medida_ancho : '',
+                    });
+                  }}
                   className="rounded-xl border border-gray-700/80 bg-gray-900/80 px-3.5 py-2.5 text-xs text-white focus:border-cyan-500 focus:outline-none"
                 >
                   <option value="">Seleccionar producto</option>
@@ -402,36 +461,44 @@ export default function CotizarPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3 mb-4">
-                <input
-                  type="number"
-                  placeholder="Largo (cm)"
-                  value={productoActual.medida_largo}
-                  onChange={(e) => setProductoActual({...productoActual, medida_largo: e.target.value})}
-                  className="rounded-xl border border-gray-700/80 bg-gray-900/80 px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none"
-                />
-                <input
-                  type="number"
-                  placeholder="Ancho (cm)"
-                  value={productoActual.medida_ancho}
-                  onChange={(e) => setProductoActual({...productoActual, medida_ancho: e.target.value})}
-                  className="rounded-xl border border-gray-700/80 bg-gray-900/80 px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none"
-                />
-                <input
-                  type="number"
-                  placeholder="Cantidad"
-                  min="1"
-                  max={(() => {
-                    const producto = productos.find(p => p.id === parseInt(productoActual.producto_id));
-                    return producto?.stock || 1;
-                  })()}
-                  value={productoActual.cantidad}
-                  onChange={(e) => setProductoActual({...productoActual, cantidad: Math.min(parseInt(e.target.value) || 1, (() => {
-                    const producto = productos.find(p => p.id === parseInt(productoActual.producto_id));
-                    return producto?.stock || 1;
-                  })())})}
-                  className="rounded-xl border border-gray-700/80 bg-gray-900/80 px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none"
-                />
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+                {(() => {
+                  const productoSeleccionado = productos.find(p => p.id === parseInt(productoActual.producto_id));
+                  const tipo = productoSeleccionado?.tipo || '';
+                  const showLargo = requiereLargo(tipo);
+                  const showAncho = requiereAncho(tipo);
+                  const fullWidth = !showLargo && !showAncho;
+                  return (
+                    <>
+                      {showLargo && (
+                        <input
+                          type="number"
+                          placeholder="Largo (cm)"
+                          value={productoActual.medida_largo}
+                          onChange={(e) => setProductoActual({...productoActual, medida_largo: e.target.value})}
+                          className="rounded-xl border border-gray-700/80 bg-gray-900/80 px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none"
+                        />
+                      )}
+                      {showAncho && (
+                        <input
+                          type="number"
+                          placeholder="Ancho (cm)"
+                          value={productoActual.medida_ancho}
+                          onChange={(e) => setProductoActual({...productoActual, medida_ancho: e.target.value})}
+                          className="rounded-xl border border-gray-700/80 bg-gray-900/80 px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none"
+                        />
+                      )}
+                      <input
+                        type="number"
+                        placeholder="Cantidad"
+                        min="1"
+                        value={productoActual.cantidad}
+                        onChange={(e) => cambiarCantidad(e.target.value)}
+                        className={`rounded-xl border border-gray-700/80 bg-gray-900/80 px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none ${fullWidth ? 'col-span-2 lg:col-span-3' : 'lg:col-span-1'}`}
+                      />
+                    </>
+                  );
+                })()}
               </div>
 
               <button
